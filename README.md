@@ -149,6 +149,10 @@ pip install -e .[dev]
 pytest
 ```
 
+For instructions on provisioning a GCP Compute Engine VM with an NVIDIA L4
+GPU and running the tests and live smoke tests there, see
+[`docs/GCP_TESTING.md`](docs/GCP_TESTING.md).
+
 ## License
 
 [MIT](LICENSE) — free to use in your own projects.
