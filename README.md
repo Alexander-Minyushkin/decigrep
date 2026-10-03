@@ -1,0 +1,154 @@
+# DeciGrep
+
+A grep-like command-line utility that finds lines in a file matching a
+pattern, using **Ollama decision models** (the System One API, e.g.
+[`nimble`](https://ollama.com/library/nimble)) instead of regular
+expressions.
+
+Each line is sent to the model together with the pattern. The model chooses
+between the configured criteria (by default `yes` / `no`), and the line is
+printed to standard output when the probability of the *positive* criterion
+(`yes` by default) is greater than the confidence threshold (`0.5` by
+default).
+
+```
+$ decigrep "payment failed" logs.txt
+Our checkout has returned 500 errors since 9am.
+Card payment declined for order #12345.
+```
+
+## Requirements
+
+- Python 3.9+
+- [Ollama](https://ollama.com/) v0.35.0 or later running locally
+  (`http://localhost:11434`)
+- A decision model, for example:
+
+  ```shell
+  ollama pull nimble
+  ```
+
+## Installation
+
+```shell
+pip install .
+# or, editable for development:
+pip install -e .[dev]
+```
+
+After installation the `decigrep` command is available. You can also run it
+without installing:
+
+```shell
+python -m decigrep --help
+```
+
+## Usage
+
+```
+decigrep [OPTIONS] PATTERN FILE
+```
+
+`PATTERN` is a plain-text pattern, **not** a regular expression — matching is
+semantic (the model judges whether the line "means" the pattern). `FILE` is
+the file to scan, or `-` to read from standard input.
+
+### Options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `-m, --model` | `nimble` | Ollama decision model to use |
+| `-u, --url` | `http://localhost:11434` | Ollama base URL |
+| `-t, --threshold P` | `0.5` | Print a line when `P(positive) > P` |
+| `-c, --criteria SPEC` | `yes,no` | Comma-separated `key[:description]` criteria; the first key is the positive one |
+| `--instructions TEXT` | default | Custom question instructions for the model; `{pattern}` is replaced with the search pattern |
+| `-n, --line-number` | off | Prefix printed lines with their 1-based line number |
+| `-v, --invert-match` | off | Print lines that do **not** match |
+| `-w, --workers N` | `1` | Number of concurrent Ollama requests |
+| `-r, --retries N` | `2` | Retries per line after a failed request |
+| `--timeout S` | `60` | Per-request timeout in seconds |
+| `--keep-alive VALUE` | `-1` | Ollama `keep_alive`; `-1` keeps the model loaded between requests |
+| `-V, --verbose` | off | Print per-line probabilities and skip reasons to stderr |
+| `-q, --quiet` | off | Suppress progress and warnings on stderr |
+| `--version` | — | Show version and exit |
+| `-h, --help` | — | Show help and exit |
+
+### Exit status
+
+Like `grep`:
+
+| Code | Meaning |
+| --- | --- |
+| `0` | At least one line was printed |
+| `1` | No line matched |
+| `2` | Error (missing file, invalid options, failed API calls) |
+
+## Examples
+
+```shell
+# Print lines about refunds (semantic matching, not literal text)
+decigrep "refund request" tickets.txt
+
+# Show line numbers, as with grep -n
+decigrep -n "urgent outage" incidents.log
+
+# Print lines that do NOT match
+decigrep -v "routine" tickets.txt
+
+# Use custom criteria (the first key is the positive one)
+decigrep -c "relevant:Line is relevant,irrelevant:Line is irrelevant" notes.txt
+
+# Custom threshold and model
+decigrep -t 0.8 -m tev1 "database error" app.log
+
+# Custom question wording (the {pattern} placeholder is substituted)
+decigrep --instructions 'Is "{pattern}" the main topic of this line?' notes.txt
+
+# Scan faster with concurrent requests (results stay in file order)
+decigrep -w 4 "payment failed" transactions.log
+
+# Inspect the model's probabilities for every line
+decigrep -V "bug report" issues.txt
+
+# Read from stdin
+cat log.txt | decigrep "service is down" -
+```
+
+## How it works
+
+For every non-blank line, DeciGrep sends one request to
+`POST <url>/v1/systemone`:
+
+```json
+{
+  "model": "nimble",
+  "state": "Our checkout has returned 500 errors since 9am.",
+  "questions": {
+    "match": {
+      "type": "choice",
+      "instructions": "Does the line match the pattern \"payment failed\"? Judge by meaning and topic, not just exact wording.",
+      "criteria": { "yes": null, "no": null }
+    }
+  }
+}
+```
+
+The line is printed when `answers.match.probabilities["yes"] > threshold`.
+
+Notes:
+
+- Blank lines are skipped (the API requires a non-empty `state`).
+- Lines longer than 64 KiB are skipped (the image-less request limit).
+- The full API contract is documented in [`docs/Ollama-SystemOne.md`](docs/Ollama-SystemOne.md)
+  and [`docs/Ollama-Decision.md`](docs/Ollama-Decision.md).
+
+## Development
+
+```shell
+pip install -e .[dev]
+pytest
+```
+
+## License
+
+[MIT](LICENSE) — free to use in your own projects.
