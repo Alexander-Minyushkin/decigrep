@@ -34,7 +34,8 @@ gcloud compute instances create ollama-test-vm \
     --boot-disk-size=100GB \
     --boot-disk-type=pd-balanced \
     --maintenance-policy=TERMINATE \
-    --metadata="install-nvidia-driver=True"
+    --metadata="install-nvidia-driver=True" \
+    --provisioning-model=SPOT
 ```
 
 > **Tip:** add `--provisioning-model=SPOT` to reduce costs for temporary
