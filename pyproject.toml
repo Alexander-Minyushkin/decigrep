@@ -32,9 +32,13 @@ dev = ["pytest>=7"]
 
 [project.scripts]
 decigrep = "decigrep.cli:main"
+# Runs bench/hdfs_anomaly.py; requires Ollama running with the model pulled.
+decigrep-benchmark = "bench.hdfs_anomaly:main"
 
 [tool.setuptools]
-packages = ["decigrep"]
+packages = ["decigrep", "bench"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Allow tests to import the top-level `bench` package without reinstalling.
+pythonpath = ["."]

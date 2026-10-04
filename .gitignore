@@ -25,3 +25,6 @@ Thumbs.db
 # Editor noise
 .idea/
 .vscode/
+
+# Benchmarks
+bench/data/*

@@ -142,6 +142,29 @@ Notes:
 - The full API contract is documented in [`docs/Ollama-SystemOne.md`](docs/Ollama-SystemOne.md)
   and [`docs/Ollama-Decision.md`](docs/Ollama-Decision.md).
 
+## Benchmarks
+
+An anomaly-detection benchmark for the HDFS_v1 dataset from
+[LogHub](https://github.com/logpai/loghub) lives in
+[`bench/`](bench/README.md). It measures accuracy, precision, recall and
+F1-score of a decision model on HDFS log blocks and prints the full report
+(date, model version, CPU/GPU, total time, metrics, citation) to stdout:
+
+```shell
+# 1. download HDFS_v1 yourself (see bench/README.md) and extract it into bench/data
+# 2. run the benchmark against a decision model
+python -m bench.hdfs_anomaly --model nimble
+# or, after `pip install -e .`, the installed console command:
+decigrep-benchmark --model nimble
+```
+
+The ~1.4 GB dataset is **not** stored in git — you download it once from
+LogHub and extract it into `bench/data` (overridable via `--dataset` or the
+`HDFS_V1_DIR` environment variable). `HDFS.log` and `anomaly_label.csv` are
+located automatically even when the archive extracts into a nested
+subfolder. Full instructions, CLI options and example output are in
+[`bench/README.md`](bench/README.md).
+
 ## Development
 
 ```shell
