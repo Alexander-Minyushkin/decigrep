@@ -184,7 +184,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     client = SystemOneClient(base_url=args.url, timeout=args.timeout)
     isatty = getattr(sys.stderr, "isatty", lambda: False)
-    show_progress = (not args.quiet) and bool(isatty())
+    # Progress lines on stderr are opt-in: off unless --verbose is given
+    # (and never shown with --quiet or when stderr is not a terminal).
+    show_progress = args.verbose and (not args.quiet) and bool(isatty())
 
     if args.verbose and not args.quiet:
         print(

@@ -9,7 +9,7 @@ probability of the first (positive) criterion exceeds the threshold.
 from __future__ import annotations
 
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple
 
@@ -178,7 +178,11 @@ def scan_lines(
     """Evaluate every line and yield a :class:`Decision` in input order.
 
     With ``workers > 1``, lines are evaluated concurrently while results are
-    still yielded in the original file order.
+    still yielded in the original file order. Yields stream as early as
+    possible: a decision is produced as soon as every line before it has been
+    decided, without waiting for the rest of the file — unlike
+    ``ThreadPoolExecutor.map``, which evaluates (and consumes) the whole
+    input before the first result can be printed.
     """
 
     def work(item: Tuple[int, str]) -> Decision:
@@ -205,5 +209,24 @@ def scan_lines(
             yield work(item)
         return
 
+    # Bounded reorder window: keep at most ``2 * workers`` requests in flight
+    # ahead of the next line to be yielded. This streams results in order
+    # without unbounded prefetching of the whole file.
+    window = workers * 2
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        yield from pool.map(work, lines)
+        pending: Dict[int, Future] = {}
+        next_out = 0
+        next_in = 0
+        exhausted = False
+        items = iter(lines)
+        while not (exhausted and not pending):
+            while not exhausted and next_in - next_out < window:
+                item = next(items, None)
+                if item is None:
+                    exhausted = True
+                    break
+                pending[next_in] = pool.submit(work, item)
+                next_in += 1
+            decision = pending.pop(next_out).result()
+            next_out += 1
+            yield decision

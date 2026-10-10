@@ -85,7 +85,7 @@ the file to scan, or `-` to read from standard input.
 | `-r, --retries N` | `2` | Retries per line after a failed request |
 | `--timeout S` | `60` | Per-request timeout in seconds |
 | `--keep-alive VALUE` | `-1` | Ollama `keep_alive`; `-1` keeps the model loaded between requests |
-| `-V, --verbose` | off | Print per-line probabilities and skip reasons to stderr |
+| `-V, --verbose` | off | Print progress, per-line probabilities and skip reasons to stderr |
 | `-q, --quiet` | off | Suppress progress and warnings on stderr |
 | `--version` | — | Show version and exit |
 | `-h, --help` | — | Show help and exit |
@@ -121,7 +121,8 @@ decigrep -t 0.8 -m tev1 "database error" app.log
 # Custom question wording (the {pattern} placeholder is substituted)
 decigrep --instructions 'Is "{pattern}" the main topic of this line?' notes.txt
 
-# Scan faster with concurrent requests (results stay in file order)
+# Scan faster with concurrent requests (matching lines are printed on the
+# go, as soon as they are decided; output order always follows the file)
 decigrep -w 4 "payment failed" transactions.log
 
 # Inspect the model's probabilities for every line

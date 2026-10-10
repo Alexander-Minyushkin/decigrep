@@ -161,6 +161,39 @@ class ScanLinesTests(unittest.TestCase):
         )
         self.assertEqual([d.match for d in decisions], [True, False])
 
+    def test_multiworker_streams_in_order(self):
+        import time as _time
+
+        client = Mock()
+
+        def fake_decide(**kwargs):
+            state = kwargs["state"]
+            if state == "slow":
+                _time.sleep(0.2)
+            return _fake_response(yes=0.99, no=0.01)
+
+        client.decide.side_effect = fake_decide
+        tags = ["slow", "f1", "f2", "f3", "f4"]
+        lines = [(i, f"{tag}\n") for i, tag in enumerate(tags, start=1)]
+        decisions = list(
+            scan_lines(
+                client,
+                lines,
+                model="nimble",
+                pattern="x",
+                criteria=DEFAULT_CRITERIA,
+                positive_key="yes",
+                threshold=0.5,
+                keep_alive="-1",
+                retries=0,
+                workers=4,
+            )
+        )
+        # Results are yielded strictly in input order even though later lines
+        # finish before the first one.
+        self.assertEqual([d.line_number for d in decisions], [1, 2, 3, 4, 5])
+        self.assertEqual([d.match for d in decisions], [True] * len(tags))
+
 
 class CliTests(unittest.TestCase):
     def test_parser_defaults(self):
