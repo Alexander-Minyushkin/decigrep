@@ -18,7 +18,7 @@ smoke tests with Ollama.
   ```
 
 - **GPU quota:** ensure your project has quota for `NVIDIA_L4_GPUS` in your
-  target region (e.g., `us-central1`).
+  target region (e.g., `us-central1`). How to increase quotas: https://cloud.google.com/compute/quotas
 
 ## 1. Provision the G2 instance
 
@@ -29,12 +29,11 @@ gcloud compute instances create ollama-test-vm \
     --zone=us-central1-a \
     --machine-type=g2-standard-4 \
     --accelerator=type=nvidia-l4,count=1 \
-    --image-family=common-cu121-debian-11-py310 \
+    --image-family=common-cu129-ubuntu-2204-nvidia-580 \
     --image-project=deeplearning-platform-release \
     --boot-disk-size=100GB \
     --boot-disk-type=pd-balanced \
     --maintenance-policy=TERMINATE \
-    --metadata="install-nvidia-driver=True" \
     --provisioning-model=SPOT
 ```
 

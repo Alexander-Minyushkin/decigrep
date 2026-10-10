@@ -12,7 +12,7 @@ printed to standard output when the probability of the *positive* criterion
 default).
 
 ```
-$ decigrep "payment failed" logs.txt
+$ decigrep "payment failed" sample.log
 Our checkout has returned 500 errors since 9am.
 Card payment declined for order #12345.
 ```
