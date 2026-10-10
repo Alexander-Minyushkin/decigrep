@@ -73,11 +73,33 @@ DEFAULT_OLLAMA_URL = "http://localhost:11434"
 BLOCK_ID_RE = re.compile(r"\bblk_(-?\d+)\b")
 
 #: Default question wording; criteria keys stay "yes"/"no".
+#:
+#: The wording is tuned for the HDFS_v1 dataset: almost every line is a
+#: routine INFO message, and several *normal* messages contain words that look
+#: alarming out of context (e.g. ``PacketResponder ... terminating``,
+#: ``Termination`` status, ``deleting block``). A generic prompt therefore
+#: floods the results with false positives. The instructions below define
+#: concrete anomaly evidence and explicitly whitelist the routine operational
+#: messages so the model answers 'no' unless it sees a real failure.
 DEFAULT_INSTRUCTIONS = (
-    "Does this HDFS log excerpt indicate an anomaly? "
-    "Signs of an anomaly include error messages, exceptions, failed or aborted "
-    "operations, unexpected terminations and unusual system behavior. "
-    "Answer 'yes' only if the excerpt clearly shows such signs, otherwise 'no'."
+    "You are given a raw HDFS (Hadoop Distributed File System) log excerpt "
+    "covering one file-system block. Decide whether the excerpt contains "
+    "evidence of a real failure.\n"
+    "Answer 'yes' (anomalous) ONLY if you see explicit failure evidence, such "
+    "as: a Java exception or stack trace (e.g. java.io.IOException, "
+    "'Exception in ...'), a log record at ERROR level, 'FAILED', 'bad block', "
+    "'Report of bad block', 'exceeding limit', 'cannot', 'could not', or an "
+    "operation that visibly failed or was aborted mid-way.\n"
+    "Answer 'no' (normal) for routine operational messages, even when their "
+    "wording sounds negative on its own. In particular these are all NORMAL: "
+    "'Received block blk_... of size ...', 'Sent blk_...', 'Served block "
+    "blk_... to ...', 'Receiving block blk_...', 'writeBlock blk_... "
+    "receiving', 'PacketResponder ... for block blk_... terminating', "
+    "'Termination', 'Terminating', 'deleting blk_...', 'Moved blk_...', "
+    "'Starting thread', 'DatanodeRegistration', 'Writing blk_...'.\n"
+    "An excerpt that only shows successful block writes, reads, transfers and "
+    "clean shutdowns is normal. If the excerpt shows no clear failure "
+    "evidence, or you are unsure, answer 'no'."
 )
 
 CITATION = """🔥 Citation
