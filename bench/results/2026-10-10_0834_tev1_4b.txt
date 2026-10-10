@@ -1,0 +1,32 @@
+==============================================================================
+🔥 Benchmark: HDFS_v1 Anomaly Detection
+==============================================================================
+Date:              2026-10-10T08:34:44+00:00
+Model:             tev1:4b
+Model version:     tev1:4b, 4.2B, Q8_0
+DeciGrep version:  0.1.0
+Dataset:           /home/alexander_minushkin/decigrep/bench/data
+Blocks evaluated:  200 (100 anomalous / 100 normal, seed=42)
+Lines per block:   up to 30
+------------------------------------------------------------------------------
+Hardware:
+  CPU:             x86_64, 4 logical CPU(s)
+  GPU:             NVIDIA L4, 23034 MiB
+------------------------------------------------------------------------------
+Total time:        3m 07s (187.6s)
+------------------------------------------------------------------------------
+Results (anomaly = positive class):
+  Accuracy:        0.7165
+  Precision:       1.0000
+  Recall:          0.3571
+  F1-score:        0.5263
+  Confusion:       TP=20 FP=0 FN=36 TN=71
+  API errors:      73 (excluded from metrics)
+------------------------------------------------------------------------------
+🔥 Citation
+Please cite the following two papers if you use the loghub datasets in your research.
+
+Loghub: Jieming Zhu, Shilin He, Pinjia He, Jinyang Liu, Michael R. Lyu. Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics. IEEE International Symposium on Software Reliability Engineering (ISSRE), 2023.
+
+Loghub-2.0: Zhihan Jiang, Jinyang Liu, Junjie Huang, Yichen Li, Yintong Huo, Jiazhen Gu, Zhuangbin Chen, Jieming Zhu, Michael R. Lyu. A Large-scale Evaluation for Log Parsing Techniques: How Far are We?. ACM SIGSOFT International Symposium on Software Testing and Analysis (ISSTA), 2024.
+==============================================================================

@@ -436,7 +436,7 @@ def format_duration(seconds: float) -> str:
 
 
 #: Where benchmark reports are auto-saved (relative to the working directory).
-DEFAULT_REPORTS_DIR = "benchmarks"
+DEFAULT_REPORTS_DIR = os.path.join("bench", "results")
 
 
 def save_report(
