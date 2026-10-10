@@ -28,6 +28,23 @@ Card payment declined for order #12345.
   ollama pull nimble
   ```
 
+### Starting Ollama
+
+Ollama must be running before you invoke DeciGrep. On Windows and macOS the
+desktop app starts a background server automatically; on Linux (or a headless
+server/VM) either let the `systemd` service from the installer handle it or
+start the server manually:
+
+```shell
+ollama serve
+```
+
+By default it listens on `http://localhost:11434`; use `OLLAMA_HOST` (e.g.
+`OLLAMA_HOST=0.0.0.0:11434 ollama serve`) to bind another interface. If
+DeciGrep starts before the server is up, the first request may take a few
+seconds or fail with "could not reach Ollama" — run
+`decigrep -V ...` for verbose progress.
+
 ## Installation
 
 ```shell

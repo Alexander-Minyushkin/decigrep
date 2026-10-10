@@ -186,6 +186,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     isatty = getattr(sys.stderr, "isatty", lambda: False)
     show_progress = (not args.quiet) and bool(isatty())
 
+    if args.verbose and not args.quiet:
+        print(
+            f"decigrep: contacting Ollama at {args.url} with model "
+            f"{args.model} (the first request can take a few seconds "
+            "while Ollama starts and loads the model)",
+            file=sys.stderr,
+        )
+
     printed = 0
     total = 0
     errors = 0

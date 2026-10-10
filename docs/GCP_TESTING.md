@@ -80,6 +80,22 @@ Verify Ollama is running and has GPU access:
 ollama --version
 ```
 
+Make sure the Ollama server is actually up. The install script usually
+enables and starts a `systemd` service — check it with
+`systemctl status ollama`. If the service is not running (or on a system
+without systemd), start the server manually:
+
+```bash
+ollama serve
+```
+
+To expose the server to other machines (e.g. your laptop running DeciGrep
+against this VM's GPU), bind it to all interfaces:
+
+```bash
+OLLAMA_HOST=0.0.0.0:11434 ollama serve
+```
+
 Pull the decision model used by DeciGrep (`nimble`). Note: this replaces the
 `llama3:8b` example from generic Ollama setups — DeciGrep requires a
 *decision* model:
@@ -129,12 +145,11 @@ Run the unit test suite (either runner works; the tests are written with
 
 ```bash
 python -m unittest discover -s tests -v
-# or:
-pytest
 ```
 
 Run a live smoke test against the locally running Ollama using the bundled
-sample file:
+sample file. Note that first execuion can take few seconds if Ollama did not
+start yet.
 
 ```bash
 python -m decigrep -V "payment failed" sample.log

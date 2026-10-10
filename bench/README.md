@@ -25,6 +25,23 @@ once, as described below.
   pip install -e .[dev]
   ```
 
+### Start the Ollama server
+
+The benchmark talks to Ollama over HTTP, so the server must be running before
+you start. On Windows/macOS the desktop app starts it automatically; on Linux
+either rely on the `systemd` service installed by the Ollama installer
+(`systemctl status ollama`) or start it manually:
+
+```shell
+ollama serve
+```
+
+To benchmark against a remote GPU box instead of localhost, start the server
+there with `OLLAMA_HOST=0.0.0.0:11434 ollama serve` and pass its address to
+the benchmark with `-u http://<host>:11434`. Note: the first request can take
+a few seconds if Ollama or the model has not been started/loaded yet; the
+wall-clock time reported by the benchmark includes this warm-up.
+
 ## 2. Download the HDFS_v1 dataset
 
 The dataset is **not** part of this repository. Download it from LogHub:
@@ -32,7 +49,11 @@ The dataset is **not** part of this repository. Download it from LogHub:
 1. Open <https://github.com/logpai/loghub>
 2. Enter the **HDFS** folder (HDFS_v1)
 3. Follow the *Data Download* link in that folder's README to obtain the
-   archive containing `HDFS.log` and `anomaly_label.csv`
+   archive containing `HDFS.log` and `anomaly_label.csv` For example:
+```bash
+wget -O HDFS_v1.zip "https://zenodo.org/records/8196385/files/HDFS_v1.zip?download=1"
+```
+
 4. Extract the archive into `bench/data/` (the default dataset directory)
 
 The archive may extract with either layout (or even nested one level
