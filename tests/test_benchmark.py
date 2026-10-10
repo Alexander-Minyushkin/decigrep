@@ -7,6 +7,7 @@ suite runs offline.
 from __future__ import annotations
 
 import csv
+import datetime
 import io
 import json
 import os
@@ -29,6 +30,7 @@ from bench.hdfs_anomaly import (
     main,
     normalize_block_id,
     sample_blocks,
+    save_report,
 )
 
 LOG_LINE = "081109 203518 148 2489418647 RECEIVING BLOCK blk_3585376470833578214 src: /10.251.43.220:50010\n"
@@ -46,6 +48,31 @@ class NormalizeBlockIdTests(unittest.TestCase):
 
     def test_case_insensitive(self):
         self.assertEqual(normalize_block_id("BLK_123"), "123")
+
+
+class SaveReportTests(unittest.TestCase):
+    WHEN = datetime.datetime(2026, 10, 10, 7, 43)
+
+    def test_filename_contains_date_and_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = save_report("REPORT", "nimble", started_at=self.WHEN, reports_dir=tmp)
+            self.assertTrue(os.path.basename(path).endswith("2026-10-10_0743_nimble.txt"))
+            with open(path, encoding="utf-8") as handle:
+                self.assertEqual(handle.read(), "REPORT")
+
+    def test_unsafe_model_chars_are_sanitized(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = save_report("R", "some/model:8b", started_at=self.WHEN, reports_dir=tmp)
+            self.assertEqual(os.path.basename(path), "2026-10-10_0743_some_model_8b.txt")
+
+    def test_same_minute_runs_get_numeric_suffix(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            first = save_report("a", "nimble", started_at=self.WHEN, reports_dir=tmp)
+            second = save_report("b", "nimble", started_at=self.WHEN, reports_dir=tmp)
+            self.assertEqual(os.path.basename(first), "2026-10-10_0743_nimble.txt")
+            self.assertEqual(os.path.basename(second), "2026-10-10_0743_nimble-1.txt")
+            self.assertTrue(os.path.exists(first))
+            self.assertTrue(os.path.exists(second))
 
 
 class LoadLabelsTests(unittest.TestCase):

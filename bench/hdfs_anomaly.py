@@ -41,6 +41,7 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime
+import io
 import os
 import platform
 import random
@@ -434,6 +435,37 @@ def format_duration(seconds: float) -> str:
     return f"{secs}s"
 
 
+#: Where benchmark reports are auto-saved (relative to the working directory).
+DEFAULT_REPORTS_DIR = "benchmarks"
+
+
+def save_report(
+    report: str,
+    model: str,
+    *,
+    started_at: datetime.datetime,
+    reports_dir: str = DEFAULT_REPORTS_DIR,
+) -> str:
+    """Write the benchmark *report* under *reports_dir* and return the path.
+
+    The file name embeds the run's start time and the model name, e.g.
+    ``benchmarks/2026-10-10_0743_nimble.txt``. A numeric suffix (``-1``,
+    ``-2``, …) is appended when the name would collide with an existing
+    report from the same minute.
+    """
+    safe_model = re.sub(r"[^A-Za-z0-9._-]+", "_", model).strip("._") or "model"
+    os.makedirs(reports_dir, exist_ok=True)
+    base = f"{started_at.strftime('%Y-%m-%d_%H%M')}_{safe_model}"
+    path = os.path.join(reports_dir, f"{base}.txt")
+    suffix = 0
+    while os.path.exists(path):
+        suffix += 1
+        path = os.path.join(reports_dir, f"{base}-{suffix}.txt")
+    with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(report)
+    return path
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -648,15 +680,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     separator = "=" * 78
     rule = "-" * 78
-    out = sys.stdout
+    buffer = io.StringIO()
+    out = buffer
     print(separator, file=out)
     print(f"🔥 Benchmark: {BENCHMARK_NAME}", file=out)
     print(separator, file=out)
-    print(
-        f"Date:              "
-        f"{datetime.datetime.now().astimezone().isoformat(timespec='seconds')}",
-        file=out,
-    )
+    started_at_local = datetime.datetime.now().astimezone()
+    print(f"Date:              {started_at_local.isoformat(timespec='seconds')}", file=out)
     print(f"Model:             {args.model}", file=out)
     print(f"Model version:     {model_info}", file=out)
     print(f"DeciGrep version:  {DECIGREP_VERSION}", file=out)
@@ -689,6 +719,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print(rule, file=out)
     print(CITATION, file=out)
     print(separator, file=out)
+
+    report = buffer.getvalue()
+    sys.stdout.write(report)
+    sys.stdout.flush()
+
+    # Auto-save the report under benchmarks/ (or DEFAULT_REPORTS_DIR).
+    try:
+        saved_path = save_report(report, args.model, started_at=started_at_local)
+    except OSError as exc:
+        print(f"decigrep-benchmark: could not save the report: {exc}", file=sys.stderr)
+    else:
+        print(f"Report saved to: {saved_path}")
     return 0
 
 

@@ -175,6 +175,9 @@ python -m bench.hdfs_anomaly --model nimble
 decigrep-benchmark --model nimble
 ```
 
+Every run also **auto-saves** its report to the `benchmarks/` directory (e.g.
+`benchmarks/2026-10-10_0743_nimble.txt`) and prints the saved path at the end.
+
 The ~1.4 GB dataset is **not** stored in git — you download it once from
 LogHub and extract it into `bench/data` (overridable via `--dataset` or the
 `HDFS_V1_DIR` environment variable). `HDFS.log` and `anomaly_label.csv` are

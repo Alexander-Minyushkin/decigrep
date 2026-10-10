@@ -88,7 +88,11 @@ Or use the installed console command (same thing):
 decigrep-benchmark --model nimble
 ```
 
-The result is printed to **stdout** and includes:
+The result is printed to **stdout** and is **auto-saved** into the
+`benchmarks/` directory with a timestamped filename, e.g.
+`benchmarks/2026-10-10_0743_nimble.txt` (the final stdout line shows the
+exact path; runs in the same minute get a `-1`, `-2`, … suffix). The saved
+report includes:
 
 - benchmark name, run date, model version (parameter size, quantization,
   digest from Ollama's `/api/show`)
