@@ -2,8 +2,7 @@
 
 A grep-like command-line utility that finds lines in a file matching a
 pattern, using **Ollama decision models** (the System One API, e.g.
-[`nimble`](https://ollama.com/library/nimble)) instead of regular
-expressions.
+`tev1:0.8b`) instead of regular expressions.
 
 Each line is sent to the model together with the pattern. The model chooses
 between the configured criteria (by default `yes` / `no`), and the line is
@@ -25,7 +24,7 @@ Card payment declined for order #12345.
 - A decision model, for example:
 
   ```shell
-  ollama pull nimble
+  ollama pull tev1:0.8b
   ```
 
 ### Starting Ollama
@@ -74,7 +73,7 @@ the file to scan, or `-` to read from standard input.
 
 | Option | Default | Description |
 | --- | --- | --- |
-| `-m, --model` | `nimble` | Ollama decision model to use |
+| `-m, --model` | `tev1:0.8b` | Ollama decision model to use |
 | `-u, --url` | `http://localhost:11434` | Ollama base URL |
 | `-t, --threshold P` | `0.5` | Print a line when `P(positive) > P` |
 | `-c, --criteria SPEC` | `yes,no` | Comma-separated `key[:description]` criteria; the first key is the positive one |
@@ -116,7 +115,7 @@ decigrep -v "routine" tickets.txt
 decigrep -c "relevant:Line is relevant,irrelevant:Line is irrelevant" notes.txt
 
 # Custom threshold and model
-decigrep -t 0.8 -m tev1 "database error" app.log
+decigrep -t 0.8 -m nimble "database error" app.log
 
 # Custom question wording (the {pattern} placeholder is substituted)
 decigrep --instructions 'Is "{pattern}" the main topic of this line?' notes.txt
@@ -139,7 +138,7 @@ For every non-blank line, DeciGrep sends one request to
 
 ```json
 {
-  "model": "nimble",
+  "model": "tev1:0.8b",
   "state": "Our checkout has returned 500 errors since 9am.",
   "questions": {
     "match": {
@@ -171,13 +170,13 @@ F1-score of a decision model on HDFS log blocks and prints the full report
 ```shell
 # 1. download HDFS_v1 yourself (see bench/README.md) and extract it into bench/data
 # 2. run the benchmark against a decision model
-python -m bench.hdfs_anomaly --model nimble
+python -m bench.hdfs_anomaly --model tev1:0.8b
 # or, after `pip install -e .`, the installed console command:
-decigrep-benchmark --model nimble
+decigrep-benchmark --model tev1:0.8b
 ```
 
 Every run also **auto-saves** its report to the `bench/results/` directory
-(e.g. `bench/results/2026-10-10_0743_nimble.txt`) and prints the saved path
+(e.g. `bench/results/2026-10-10_0743_tev1_0.8b.txt`) and prints the saved path
 at the end.
 
 The ~1.4 GB dataset is **not** stored in git — you download it once from

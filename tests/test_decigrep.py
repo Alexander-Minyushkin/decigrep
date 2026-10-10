@@ -200,7 +200,7 @@ class CliTests(unittest.TestCase):
         from decigrep.cli import build_parser
 
         args = build_parser().parse_args(["pattern", "file.txt"])
-        self.assertEqual(args.model, "nimble")
+        self.assertEqual(args.model, "tev1:0.8b")
         self.assertEqual(args.threshold, 0.5)
         self.assertEqual(args.criteria, "yes,no")
         self.assertEqual(args.url, "http://localhost:11434")

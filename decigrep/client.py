@@ -90,11 +90,11 @@ class SystemOneClient:
 
         hint = ""
         if response.status_code == 404:
-            hint = " Download the model first, e.g. `ollama pull nimble`."
+            hint = " Download the model first, e.g. `ollama pull tev1:0.8b`."
         elif response.status_code == 400:
             hint = (
                 " Check that the model supports System One scoring (e.g. "
-                "`ollama pull nimble`) and that request options such as "
+                "`ollama pull tev1:0.8b`) and that request options such as "
                 "--keep-alive are valid."
             )
         return (

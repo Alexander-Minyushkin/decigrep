@@ -33,7 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
         epilog=(
             "Exit status: 0 if at least one line was printed, 1 if no line was "
             "printed, 2 on error. Requires Ollama v0.35+ with a decision model "
-            "such as nimble (`ollama pull nimble`)."
+            "such as tev1:0.8b (`ollama pull tev1:0.8b`)."
         ),
     )
     parser.add_argument("pattern", help="pattern to match lines against")
@@ -45,8 +45,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "-m", "--model",
-        default="nimble",
-        help="Ollama decision model to use (default: nimble)",
+        default="tev1:0.8b",
+        help="Ollama decision model to use (default: tev1:0.8b)",
     )
     parser.add_argument(
         "-u", "--url",

@@ -29,11 +29,11 @@ version, hardware (CPU/GPU) and total wall-clock time.
 
 Usage::
 
-    python -m bench.hdfs_anomaly --model nimble
-    python -m bench.hdfs_anomaly --model tev1 --blocks 1000 --workers 8
+    python -m bench.hdfs_anomaly --model tev1:0.8b
+    python -m bench.hdfs_anomaly --model nimble --blocks 1000 --workers 8
 
 Requires a running Ollama instance (default http://localhost:11434) with
-the model pulled (``ollama pull nimble``).
+the model pulled (``ollama pull tev1:0.8b``).
 """
 
 from __future__ import annotations
@@ -449,7 +449,7 @@ def save_report(
     """Write the benchmark *report* under *reports_dir* and return the path.
 
     The file name embeds the run's start time and the model name, e.g.
-    ``benchmarks/2026-10-10_0743_nimble.txt``. A numeric suffix (``-1``,
+    ``bench/results/2026-10-10_0743_tev1_0.8b.txt``. A numeric suffix (``-1``,
     ``-2``, …) is appended when the name would collide with an existing
     report from the same minute.
     """
@@ -488,7 +488,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-m", "--model",
         required=True,
         metavar="NAME",
-        help="Ollama decision model to benchmark (e.g. nimble); pull it first "
+        help="Ollama decision model to benchmark (e.g. tev1:0.8b); pull it first "
              "with `ollama pull <name>`",
     )
     parser.add_argument(

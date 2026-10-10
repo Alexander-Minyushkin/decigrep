@@ -16,7 +16,7 @@ once, as described below.
 - The decision model you want to benchmark, pulled first, e.g.:
 
   ```shell
-  ollama pull nimble
+  ollama pull tev1:0.8b
   ```
 
 - DeciGrep installed in editable mode (so the `bench` package is importable):
@@ -79,18 +79,18 @@ You can keep the files anywhere and point the benchmark at them with
 ## 3. Run the benchmark
 
 ```shell
-python -m bench.hdfs_anomaly --model nimble
+python -m bench.hdfs_anomaly --model tev1:0.8b
 ```
 
 Or use the installed console command (same thing):
 
 ```shell
-decigrep-benchmark --model nimble
+decigrep-benchmark --model tev1:0.8b
 ```
 
 The result is printed to **stdout** and is **auto-saved** into the
 `bench/results/` directory with a timestamped filename, e.g.
-`bench/results/2026-10-10_0743_nimble.txt` (the final stdout line shows the
+`bench/results/2026-10-10_0743_tev1_0.8b.txt` (the final stdout line shows the
 exact path; runs in the same minute get a `-1`, `-2`, … suffix). The saved
 report includes:
 
@@ -108,7 +108,7 @@ Progress messages go to stderr so they never pollute the result.
 
 | Option | Default | Description |
 | --- | --- | --- |
-| `-m, --model NAME` | *(required)* | Ollama decision model to benchmark, e.g. `nimble` |
+| `-m, --model NAME` | *(required)* | Ollama decision model to benchmark, e.g. `tev1:0.8b` |
 | `-d, --dataset DIR` | `bench/data` | Directory that holds (or contains a subfolder with) `HDFS.log` and `anomaly_label.csv`; searched recursively (env: `HDFS_V1_DIR`) |
 | `-u, --url URL` | `http://localhost:11434` | Ollama base URL |
 | `-t, --threshold P` | `0.5` | Predict anomaly when `P(yes) > P` |
@@ -126,16 +126,16 @@ Progress messages go to stderr so they never pollute the result.
 
 ```shell
 # Small first run (200 balanced blocks, 4 workers)
-python -m bench.hdfs_anomaly --model nimble
+python -m bench.hdfs_anomaly --model tev1:0.8b
 
 # More blocks for stabler metrics; keep the model hot between requests
 python -m bench.hdfs_anomaly --model tev1 --blocks 1000 --workers 8 --keep-alive -1
 
 # Dataset kept somewhere else
-python -m bench.hdfs_anomaly --model nimble --dataset C:/data/HDFS_v1
+python -m bench.hdfs_anomaly --model tev1:0.8b --dataset C:/data/HDFS_v1
 
 # Reproduce an earlier run exactly
-python -m bench.hdfs_anomaly --model nimble --seed 42 --blocks 200
+python -m bench.hdfs_anomaly --model tev1:0.8b --seed 42 --blocks 200
 ```
 
 ### Example output
@@ -145,8 +145,8 @@ python -m bench.hdfs_anomaly --model nimble --seed 42 --blocks 200
 🔥 Benchmark: HDFS_v1 Anomaly Detection
 ================================================================================
 Date:              2026-10-04T12:30:07+03:00
-Model:             nimble
-Model version:     nimble, 0.6B params, Q4_K_M, digest=9b3c8f1e2d4a
+Model:             tev1:0.8b
+Model version:     tev1:0.8b, 0.8B params, Q8_0, digest=9b3c8f1e2d4a
 DeciGrep version:  0.1.0
 Dataset:           C:/Users/alexa/Documents/projects/DeciGrep/bench/data/HDFS_v1
 Blocks evaluated:  200 (100 anomalous / 100 normal, seed=42)

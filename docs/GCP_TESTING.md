@@ -96,12 +96,12 @@ against this VM's GPU), bind it to all interfaces:
 OLLAMA_HOST=0.0.0.0:11434 ollama serve
 ```
 
-Pull the decision model used by DeciGrep (`nimble`). Note: this replaces the
-`llama3:8b` example from generic Ollama setups — DeciGrep requires a
+Pull the decision model used by DeciGrep (`tev1:0.8b`). Note: this replaces
+the `llama3:8b` example from generic Ollama setups — DeciGrep requires a
 *decision* model:
 
 ```bash
-ollama pull nimble
+ollama pull tev1:0.8b
 ```
 
 Confirm the model is available:
