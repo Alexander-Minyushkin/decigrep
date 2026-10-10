@@ -132,13 +132,29 @@ git clone git@github.com:<your-org>/<your-repo>.git
 cd <your-repo>
 ```
 
-Set up the Python environment and install dependencies:
+Set up the Python environment and install dependencies. Install DeciGrep
+itself into the **venv** (activate it first — the prompt should show
+`(.venv)`), otherwise pip falls back to a "user installation" whose
+entry-point scripts land in `~/.local/bin` (usually not on `PATH`, so
+`decigrep` would be "command not found"):
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e .
 ```
+
+> **Troubleshooting `decigrep: command not found`:**
+> 1. Make sure the venv is activated (`which pip` should point into
+>    `.venv/bin/`), then reinstall: `pip install -e .`
+> 2. Check for a broken install: `pip list | grep -i UNKNOWN` — if it
+>    shows `UNKNOWN`, the checkout was stale or `pyproject.toml` was
+>    corrupted. Remove it (`pip uninstall -y UNKNOWN`), refresh the repo
+>    (`git checkout -- pyproject.toml && git pull`) and install again.
+> 3. If you intentionally installed without a venv, the script is in
+>    `~/.local/bin` — add it to `PATH`:
+>    `export PATH="$HOME/.local/bin:$PATH"`.
 
 Run the unit test suite (either runner works; the tests are written with
 `unittest`):

@@ -59,6 +59,33 @@ without installing:
 python -m decigrep --help
 ```
 
+### Troubleshooting `decigrep: command not found`
+
+- **Install into a virtual environment** (recommended). Installing without
+  one can trigger pip's "user installation" fallback, which puts the
+  `decigrep` script into `~/.local/bin` — a directory that is usually *not*
+  on `PATH`:
+
+  ```shell
+  python3 -m venv .venv
+  source .venv/bin/activate   # prompt should now show (.venv)
+  pip install -e .
+  decigrep -h
+  ```
+
+- If you intentionally installed without a venv, add the user script
+  directory to `PATH`:
+
+  ```shell
+  export PATH="$HOME/.local/bin:$PATH"   # add to ~/.bashrc to persist
+  ```
+
+- Check for a broken install: `pip list | grep -i UNKNOWN`. If it shows a
+  package named `UNKNOWN`, the checkout was stale or `pyproject.toml` was
+  damaged. Remove it (`pip uninstall -y UNKNOWN`), refresh the repository
+  (`git checkout -- pyproject.toml && git pull`) and install again. The
+  file must declare `name = "decigrep"` under the `[project]` table.
+
 ## Usage
 
 ```
