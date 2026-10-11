@@ -1,10 +1,10 @@
 # DeciGrep
 
 A grep-like command-line utility that finds lines in a file matching a
-pattern, using **Ollama decision models** (the System One API, e.g.
+prompt, using **Ollama decision models** (the System One API, e.g.
 `tev1:0.8b`) instead of regular expressions.
 
-Each line is sent to the model together with the pattern. The model chooses
+Each line is sent to the model together with the prompt. The model chooses
 between the configured criteria (by default `yes` / `no`), and the line is
 printed to standard output when the probability of the *positive* criterion
 (`yes` by default) is greater than the confidence threshold (`0.5` by
